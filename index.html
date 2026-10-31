@@ -124,12 +124,17 @@
     .text-balance {
       text-wrap: balance;
     }
-    /* Header elevation once the page starts scrolling */
+    /* Header sits over the hero video, then gains a glass backdrop on scroll */
     #site-header {
-      transition: box-shadow 250ms ease, background-color 250ms ease;
+      transition: background-color 300ms ease, box-shadow 300ms ease, border-color 300ms ease;
     }
-    #site-header.is-scrolled {
+    #site-header.is-scrolled,
+    #site-header.is-menu-open {
+      background-color: rgba(42, 10, 33, 0.88);
+      border-bottom-color: rgba(255, 255, 255, 0.12);
       box-shadow: 0 18px 40px -24px rgba(26, 5, 21, 0.55);
+      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px);
     }
     /* Animated underline for primary navigation */
     .nav-link {
@@ -184,26 +189,33 @@
       object-fit: cover;
       object-position: center;
     }
-    /* Keep the hero close to the 16:9 source so the full character stays in frame */
+    /* Hero fills the viewport from the very top, behind the transparent header */
     .hero-shell {
       min-height: 50rem;
-      min-height: max(50rem, calc(100svh - 5rem));
+      min-height: max(50rem, 100svh);
     }
     @media (min-width: 640px) {
       .hero-shell {
         min-height: 46rem;
-        min-height: max(46rem, calc(100svh - 5rem));
+        min-height: max(46rem, 100svh);
       }
     }
     @media (min-width: 1024px) {
       .hero-shell {
         min-height: 43rem;
-        min-height: max(43rem, calc(100svh - 5rem));
+        min-height: max(43rem, 100svh);
       }
     }
-    /* Narrow screens crop the 16:9 frame: frame the standing character instead of empty background */
+    /* Mobile: the video sits above the copy and fades into the hero backdrop */
     @media (max-width: 639px) {
-      #hero-video { object-position: 58% center; }
+      .hero-video-layer {
+        bottom: auto;
+        height: 48svh;
+        min-height: 20rem;
+        -webkit-mask-image: linear-gradient(to bottom, #000 68%, transparent 100%);
+        mask-image: linear-gradient(to bottom, #000 68%, transparent 100%);
+      }
+      #hero-video { object-position: 76% center; }
     }
     @media (min-width: 640px) and (max-width: 1023px) {
       #hero-video { object-position: 42% center; }
@@ -217,10 +229,6 @@
       .hero-copy p { font-size: 1rem; margin-top: 0.875rem; max-width: 28rem; }
       .hero-copy .hero-cta { margin-top: 1.5rem; }
       .hero-copy .hero-trust { margin-top: 1.5rem; }
-    }
-    /* Reduced motion: keep the poster frame, drop the moving video */
-    @media (prefers-reduced-motion: reduce) {
-      .hero-video { display: none; }
     }
     /* If the file cannot be played, the poster stays and no broken video is shown */
     .hero-video-layer.is-fallback .hero-video { display: none; }
@@ -425,7 +433,7 @@
 <body class="bg-cashmere-100 text-cashmere-txt antialiased selection:bg-yellow-200">
 <a class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-full focus:bg-cashmere-50 focus:px-5 focus:py-2.5 focus:text-sm focus:font-bold focus:text-mulberry-800 focus:shadow-lg" href="#main">Skip to content</a>
 <!-- BEGIN: MainHeader -->
-<header class="w-full sticky top-0 z-50 bg-[#3D0F30] supports-[backdrop-filter]:bg-[#3D0F30]/85 backdrop-blur-xl border-b border-white/10" id="site-header">
+<header class="w-full fixed inset-x-0 top-0 z-50 bg-transparent border-b border-transparent" id="site-header">
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 <div class="h-20 flex items-center justify-between gap-4">
 <!-- Brand Logo -->
@@ -493,9 +501,9 @@
 <main id="main">
 <!-- BEGIN: HeroSection -->
 <section class="relative overflow-hidden bg-[#5B394D]" id="home">
-<!-- Background video: kept exactly as-is (covers the hero, no distortion) -->
+<!-- Background video: starts at the very top of the page and plays a single time -->
 <div aria-hidden="true" class="hero-video-layer absolute inset-0 z-0 overflow-hidden pointer-events-none" id="hero-video-layer">
-<video autoplay="" class="hero-video absolute inset-0 block h-full w-full object-cover" disablepictureinpicture="" id="hero-video" loop="" muted="" playsinline="" poster="man_walking-poster.jpg" preload="auto" tabindex="-1">
+<video autoplay="" class="hero-video absolute inset-0 block h-full w-full object-cover" disablepictureinpicture="" id="hero-video" muted="" playsinline="" poster="man_walking-poster.jpg" preload="auto" tabindex="-1">
 <source src="man_walking.mp4" type="video/mp4"/>
 </video>
 </div>
@@ -504,8 +512,8 @@
 <!-- Left-aligned hero content, below the oversized DocSense wordmark -->
 <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex hero-shell flex-col justify-end pt-24 pb-12 sm:pb-14 lg:pb-12">
 <div class="max-w-2xl hero-copy [text-shadow:0_2px_28px_rgba(26,5,21,0.6)]">
-<span class="hero-enter delay-1 inline-flex items-center gap-2 rounded-full border border-white/20 bg-[#2A0A21]/55 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-md">
-<span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-lavender-300"></span>
+<span class="hero-enter delay-1 inline-flex items-center gap-2 rounded-full border border-white/50 bg-white/75 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-mulberry-900 shadow-sm backdrop-blur-md">
+<span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-mulberry-700"></span>
 AI Document Intelligence
 </span>
 <h1 class="hero-enter delay-2 mt-5 text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.06] text-white text-balance">
@@ -1815,6 +1823,8 @@ AI-Powered
           menu.classList.toggle('hidden', !open);
           if (iconOpen) iconOpen.classList.toggle('hidden', open);
           if (iconClose) iconClose.classList.toggle('hidden', !open);
+          const headerEl = document.getElementById('site-header');
+          if (headerEl) headerEl.classList.toggle('is-menu-open', open);
         };
         toggle.addEventListener('click', () => {
           setOpen(toggle.getAttribute('aria-expanded') !== 'true');
@@ -2164,45 +2174,52 @@ AI-Powered
       const video = document.getElementById('hero-video');
       if (!layer || !video) return;
 
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-      let inView = true;
-
       // Keep the poster/fallback visible instead of a broken video.
       const fallback = () => layer.classList.add('is-fallback');
       video.addEventListener('error', fallback, { once: true });
       const source = video.querySelector('source');
       if (source) source.addEventListener('error', fallback, { once: true });
 
-      const sync = () => {
-        if (reduceMotion.matches || !inView) {
-          video.pause();
-          return;
-        }
+      // Play exactly once when the page opens: no loop, no restart on scroll.
+      let started = false;
+      const interactionEvents = ['pointerdown', 'keydown'];
+      const cleanup = () => {
+        interactionEvents.forEach((name) => document.removeEventListener(name, onInteract, true));
+      };
+      function onInteract() {
+        if (started || video.ended) { cleanup(); return; }
+        video.muted = true;
+        video.play().then(() => { started = true; cleanup(); }).catch(() => {});
+      }
+      const armInteractionStart = () => {
+        if (started) return;
+        interactionEvents.forEach((name) => document.addEventListener(name, onInteract, { capture: true, passive: true }));
+      };
+      video.addEventListener('playing', () => { started = true; cleanup(); }, { once: true });
+
+      const playOnce = () => {
+        if (started || video.ended) return;
         video.muted = true; // Required for programmatic autoplay in most browsers.
         const played = video.play();
         if (played && typeof played.catch === 'function') {
-          played.catch((error) => {
-            // AbortError only means a pause interrupted play(); it is not a failure.
-            if (error && error.name === 'NotAllowedError') fallback();
+          played.then(() => { started = true; cleanup(); }).catch((error) => {
+            if (!error || error.name === 'AbortError' || error.name === 'NotAllowedError') {
+              // Autoplay policies can require a gesture; start on the first interaction, once.
+              armInteractionStart();
+              return;
+            }
+            fallback();
           });
+        } else {
+          started = true;
         }
       };
 
-      // Stop decoding while the hero is off-screen, resume when it returns.
-      if ('IntersectionObserver' in window) {
-        new IntersectionObserver((entries) => {
-          inView = entries.some((entry) => entry.isIntersecting);
-          sync();
-        }, { threshold: 0.01 }).observe(layer);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', playOnce, { once: true });
+      } else {
+        playOnce();
       }
-
-      if (typeof reduceMotion.addEventListener === 'function') {
-        reduceMotion.addEventListener('change', sync);
-      } else if (typeof reduceMotion.addListener === 'function') {
-        reduceMotion.addListener(sync);
-      }
-
-      sync();
     })();
   </script>
 </body></html>
